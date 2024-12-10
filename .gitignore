@@ -1,0 +1,18 @@
+
+# .NET
+*.dll
+*.exe
+*.pdb
+*.db
+*.log
+*.user
+*.lock.json
+*.csproj.user
+*.suo
+*.userosscache
+*.sln.docstates
+*.vs/
+.vscode/
+bin/
+obj/
+TestResults/
