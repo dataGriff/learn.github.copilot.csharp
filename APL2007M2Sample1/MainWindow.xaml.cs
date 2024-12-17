@@ -36,12 +36,71 @@ namespace ParallelAsyncExample
             "https://docs.microsoft.com/gaming"
         };
 
-        private void OnStartButtonClick(object sender, RoutedEventArgs e)
+        /// <summary>
+        /// The MainWindow class demonstrates an example of performing asynchronous operations
+        /// in parallel using HttpClient to download content from a list of URLs and display
+        /// the results in a WPF application.
+        /// </summary>
+        public partial class MainWindow : Window
         {
-            _startButton.IsEnabled = false;
-            _resultsTextBox.Clear();
+            /// <summary>
+            /// Handles the click event of the Start button.
+            /// Disables the Start button and clears the results text box.
+            /// Initiates the asynchronous operation to start summing page sizes.
+            /// </summary>
+            /// <param name="sender">The source of the event.</param>
+            /// <param name="e">The event data.</param>
+            private void OnStartButtonClick(object sender, RoutedEventArgs e)
+            {
+                // Implementation
+            }
 
-            Task.Run(() => StartSumPageSizesAsync());
+            /// <summary>
+            /// Starts the asynchronous operation to sum the sizes of pages from the URL list.
+            /// </summary>
+            private async Task StartSumPageSizesAsync()
+            {
+                // Implementation
+            }
+
+            /// <summary>
+            /// Sums the sizes of pages from the URL list asynchronously.
+            /// </summary>
+            private async Task SumPageSizesAsync()
+            {
+                // Implementation
+            }
+
+            /// <summary>
+            /// Processes the URL asynchronously by downloading its content and returning the size of the content.
+            /// </summary>
+            /// <param name="url">The URL to process.</param>
+            /// <param name="client">The HttpClient used to download the content.</param>
+            /// <returns>The size of the downloaded content in bytes.</returns>
+            private async Task<int> ProcessUrlAsync(string url, HttpClient client)
+            {
+                // Implementation
+            }
+
+            /// <summary>
+            /// Displays the results of the URL processing asynchronously.
+            /// </summary>
+            /// <param name="url">The URL that was processed.</param>
+            /// <param name="content">The content downloaded from the URL.</param>
+            /// <returns>A task representing the asynchronous operation.</returns>
+            private Task DisplayResultsAsync(string url, byte[] content)
+            {
+                // Implementation
+            }
+
+            /// <summary>
+            /// Disposes the HttpClient when the window is closed.
+            /// </summary>
+            /// <param name="e">The event data.</param>
+            protected override void OnClosed(EventArgs e)
+            {
+                // Implementation
+            }
         }
 
         private async Task StartSumPageSizesAsync()
@@ -64,7 +123,7 @@ namespace ParallelAsyncExample
 
             Task<int>[] downloadTasks = downloadTasksQuery.ToArray();
 
-            int[] lengths = Task.WhenAll(downloadTasks);
+            int[] lengths = await Task.WhenAll(downloadTasks);
             int total = lengths.Sum();
 
             await Dispatcher.BeginInvoke(() =>
@@ -78,10 +137,19 @@ namespace ParallelAsyncExample
 
         private async Task<int> ProcessUrlAsync(string url, HttpClient client)
         {
+            try
+            {
             byte[] byteArray = await client.GetByteArrayAsync(url);
             await DisplayResultsAsync(url, byteArray);
 
             return byteArray.Length;
+            }
+            catch (HttpRequestException e)
+            {
+            await Dispatcher.BeginInvoke(() =>
+                _resultsTextBox.Text += $"{url,-60} {"Error: " + e.Message,10}\n");
+            return 0;
+            }
         }
 
         private Task DisplayResultsAsync(string url, byte[] content) =>

@@ -4,6 +4,8 @@
     <OutputType>WinExe</OutputType>
     <TargetFramework>net6.0-windows</TargetFramework>
     <UseWPF>true</UseWPF>
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
+    <Description>This project is a sample WPF application targeting .NET 6.0 for Windows.</Description>
   </PropertyGroup>
 
 </Project>
