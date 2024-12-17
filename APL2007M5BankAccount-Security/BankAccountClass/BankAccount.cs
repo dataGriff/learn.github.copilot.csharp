@@ -131,8 +131,9 @@ namespace BankAccountApp
         public AccountTypes AccountType { get; }
         public DateTime DateOpened { get; }
         private const double MaxTransferAmountForDifferentOwners = 500;
+        private string Password { get; }
 
-        public BankAccount(string accountNumber, double initialBalance, string accountHolderName, string accountType, DateTime dateOpened)
+        public BankAccount(string accountNumber, double initialBalance, string accountHolderName, string accountType, DateTime dateOpened, string password)
         {
             if (accountNumber.Length != 10)
             {
@@ -167,10 +168,21 @@ namespace BankAccountApp
             //AccountType = AccountTypes.Savings; // (AccountTypes)Enum.Parse(typeof(AccountTypes), accountType);
             AccountType = (AccountTypes)Enum.Parse(typeof(AccountTypes), accountType);
             DateOpened = dateOpened;
+            Password = password;
         }
 
-        public void Credit(double amount)
+        public bool Authenticate(string password)
         {
+            return Password == password;
+        }
+
+        public void Credit(double amount, string password)
+        {
+            if (!Authenticate(password))
+            {
+                throw new UnauthorizedAccessException("Invalid password.");
+            }
+
             if (amount < 0)
             {
                 throw new InvalidCreditAmountException(amount);
@@ -179,8 +191,13 @@ namespace BankAccountApp
             Balance += amount;
         }
 
-        public void Debit(double amount)
+        public void Debit(double amount, string password)
         {
+            if (!Authenticate(password))
+            {
+                throw new UnauthorizedAccessException("Invalid password.");
+            }
+
             if (amount < 0)
             {
                 throw new InvalidDebitAmountException(amount);
@@ -201,15 +218,20 @@ namespace BankAccountApp
             return Balance; // Math.Round(balance, 2);
         }
 
-        public void Transfer(BankAccount toAccount, double amount)
+        public void Transfer(BankAccount toAccount, double amount, string password)
         {
+            if (!Authenticate(password))
+            {
+                throw new UnauthorizedAccessException("Invalid password.");
+            }
+
             ValidateTransferAmount(amount);
             ValidateTransferLimitForDifferentOwners(toAccount, amount);
 
             if (Balance >= amount)
             {
-                Debit(amount);
-                toAccount.Credit(amount);
+                Debit(amount, password);
+                toAccount.Credit(amount, password);
             }
             else
             {

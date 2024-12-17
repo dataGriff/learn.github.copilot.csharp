@@ -31,10 +31,10 @@
                     string accountType = GenerateRandomAccountType();
                     DateTime dateOpened = GenerateRandomDateOpened();
                     string accountNumber = "102000" + random.Next(1000, 9999).ToString();
-                    BankAccount account = new(accountNumber, initialBalance, accountHolderName, accountType, dateOpened);
+                    string password = GenerateRandomPassword();
+                    BankAccount account = new(accountNumber, initialBalance, accountHolderName, accountType, dateOpened, password);
                     accounts.Add(account);
                     createdAccounts++;
-
                 }
                 catch (ArgumentException ex)
                 {
@@ -61,16 +61,17 @@
                 for (int i = 0; i < numberOfTransactions; i++)
                 {
                     double transactionAmount = GenerateRandomDollarAmount(false, minTransactionAmount, maxTransactionAmount);
+                    string password = GetPasswordForAccount(account);
                     try
                     {
                         if (transactionAmount >= 0)
                         {
-                            account.Credit(transactionAmount);
+                            account.Credit(transactionAmount, password);
                             Console.WriteLine($"Credit: {transactionAmount}, Balance: {account.Balance.ToString("C")}, Account Holder: {account.AccountHolderName}, Account Type: {account.AccountType}");
                         }
                         else
                         {
-                            account.Debit(-transactionAmount);
+                            account.Debit(-transactionAmount, password);
                             Console.WriteLine($"Debit: {transactionAmount}, Balance: {account.Balance.ToString("C")}, Account Holder: {account.AccountHolderName}, Account Type: {account.AccountType}");
                         }
                     }
@@ -93,22 +94,16 @@
                 for (int i = 0; i < numberOfTransactions; i++)
                 {
                     double transactionAmount = GenerateRandomDollarAmount(false, minTransactionAmount, maxTransactionAmount);
+                    string password = GetPasswordForAccount(account);
                     try
                     {
-                        if (transactionAmount >= 0)
-                        {
-                            account.Credit(transactionAmount);
-                            Console.WriteLine($"Credit: {transactionAmount}, Balance: {account.Balance.ToString("C")}, Account Holder: {account.AccountHolderName}, Account Type: {account.AccountType}");
-                        }
-                        else
-                        {
-                            account.Debit(-transactionAmount);
-                            Console.WriteLine($"Debit: {transactionAmount}, Balance: {account.Balance.ToString("C")}, Account Holder: {account.AccountHolderName}, Account Type: {account.AccountType}");
-                        }
+                        BankAccount toAccount = accounts[random.Next(accounts.Count)];
+                        account.Transfer(toAccount, transactionAmount, password);
+                        Console.WriteLine($"Transfer: {transactionAmount}, From: {account.AccountNumber}, To: {toAccount.AccountNumber}, Balance: {account.Balance.ToString("C")}");
                     }
                     catch (Exception ex)
                     {
-                        Console.WriteLine($"Transaction failed: {ex.Message}");
+                        Console.WriteLine($"Transfer failed: {ex.Message}");
                     }
                 }
 
@@ -157,6 +152,19 @@
             }
 
             return randomDate;
+        }
+
+        static string GenerateRandomPassword()
+        {
+            const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+            return new string(Enumerable.Repeat(chars, 8).Select(s => s[random.Next(s.Length)]).ToArray());
+        }
+
+        static string GetPasswordForAccount(BankAccount account)
+        {
+            // In a real application, you would securely retrieve the password.
+            // For this example, we assume the password is known.
+            return "password"; // Replace with actual password retrieval logic.
         }
     }
 }
